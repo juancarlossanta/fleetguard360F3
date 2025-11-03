@@ -1,9 +1,13 @@
 name: Build & Analyze
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   build:
+    name: Build and analyze
     runs-on: ubuntu-latest
 
     services:
@@ -30,31 +34,42 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Necesario para un análisis más preciso en SonarQube
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: 17
-          distribution: temurin
+          distribution: 'zulu'
 
-      - name: Wait for PostgreSQL to be ready
-        run: |
-          echo "Waiting for PostgreSQL..."
-          for i in {1..10}; do
-            nc -z localhost 5432 && echo "Postgres is up!" && break
-            echo "Still waiting... ($i)"
-            sleep 5
-          done
-
-      - name: Build & Test (with coverage)
-        run: mvn -B clean test jacoco:report
-
-      - name: SonarCloud Analysis
-        uses: SonarSource/sonarcloud-github-action@master
+      - name: Cache SonarQube packages
+        uses: actions/cache@v4
         with:
-          args: >
-            -Dsonar.projectKey=juancarlossanta_fleetguard360F3
-            -Dsonar.organization=juancarlossanta
-            -Dsonar.host.url=https://sonarcloud.io
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      # Compilación del proyecto
+      - name: Compile project
+        run: mvn -B clean compile
+
+      # Ejecución de pruebas unitarias y generación de reportes JaCoCo
+      - name: Run unit tests with JaCoCo
+        run: mvn -B test jacoco:report
+
+      # Análisis con SonarQube incluyendo los reportes de cobertura
+      - name: SonarQube Analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+            -Dsonar.projectKey=juancarlossanta_fleetguard360F3 \
             -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
