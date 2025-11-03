@@ -1,48 +1,60 @@
-name: CI - build & sonar
+name: Build & Analyze
 
 on: [push, pull_request]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     services:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_USER: postgres
+          POSTGRES_USER: test
           POSTGRES_PASSWORD: test
-          POSTGRES_DB: fleetguard360F3
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        # Espera a que PostgreSQL esté "ready"
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -U test -d testdb"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+
     env:
       SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/testdb
       SPRING_DATASOURCE_USERNAME: test
       SPRING_DATASOURCE_PASSWORD: test
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
-          distribution: 'temurin'
+          java-version: 17
+          distribution: temurin
 
-      - name: Build & run tests (Maven)
-        run: mvn -B test jacoco:report
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          echo "Waiting for PostgreSQL..."
+          for i in {1..10}; do
+            nc -z localhost 5432 && echo "Postgres is up!" && break
+            echo "Still waiting... ($i)"
+            sleep 5
+          done
 
-      - name: Upload JaCoCo XML (for debug)
-        run: ls -la target/site/jacoco || true
+      - name: Build & Test (with coverage)
+        run: mvn -B clean test jacoco:report
 
-      - name: SonarCloud Scan
+      - name: SonarCloud Analysis
         uses: SonarSource/sonarcloud-github-action@master
         with:
           args: >
-            -Dsonar.projectKey=ORG_PROJECTKEY
-            -Dsonar.organization=your-org
+            -Dsonar.projectKey=juancarlossanta_fleetguard360F3
+            -Dsonar.organization=juancarlossanta
             -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
             -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
