@@ -1,0 +1,132 @@
+type PasajeroDto {
+  id: ID!
+  username: String!
+  nombre: String
+  apellido: String
+  telefono: String
+  email: String
+  createdAt: String
+}
+type Viaje {
+  id: ID!
+  origen: String!
+  destino: String!
+  fecha: String!
+  horaSalida: String!
+  horaLlegada: String!
+  cuposTotales: Int!
+  cuposDisponibles: Int!
+  estado: String!
+}
+
+type PasajeroAdicional {
+  id: ID!
+  nombre: String!
+  identificacion: String!
+}
+
+type Reserva {
+  id: ID!
+  codigoReserva: String!
+  cantidadAsientos: Int!
+  estado: String!
+  viaje: Viaje!
+  pasajeroPrincipal: PasajeroDto!
+  pasajerosAdicionales: [PasajeroAdicional!]
+  createdAt: String
+}
+
+input RegistroPasajeroInput {
+  username: String!
+  nombre: String!
+  apellido: String!
+  identificacion: String
+  telefono: String!
+  email: String!
+  password: String!
+  passwordConfirm: String!
+}
+
+type RegistroResponse {
+  success: Boolean!
+  message: String
+  pasajero: PasajeroDto
+}
+
+input LoginPasajeroInput {
+  username: String!
+  password: String!
+}
+
+type LoginResponse {
+  success: Boolean!
+  message: String
+  token: String
+  pasajero: PasajeroDto
+}
+
+input ResetPasswordInput {
+  token: String!
+  newPassword: String!
+}
+
+input BuscarViajesInput {
+  origen: String!
+  destino: String!
+  fecha: String!
+}
+
+input PasajeroAdicionalDto {
+  nombre: String!
+  identificacion: String!
+}
+
+input CrearReservaDto {
+  viajeId: ID!
+  cantidadAsientos: Int!
+  adicionales: [PasajeroAdicionalDto!]
+}
+
+input CrearViajeDto {
+  origen: String!
+  destino: String!
+  fecha: String!
+  horaSalida: String!
+  horaLlegada: String!
+  cuposTotales: Int!
+  estado: String!
+}
+
+extend type Mutation {
+  crearViaje(input: CrearViajeDto!): Viaje!
+}
+
+type ResetPasswordResponse {
+  success: Boolean!
+  message: String
+}
+
+type ReservaResponse {
+  success: Boolean!
+  message: String
+  reserva: Reserva
+}
+
+type Query {
+  checkEmail(email: String!): Boolean!
+  checkUsername(username: String!): Boolean!
+  pasajeroById(id: ID!): PasajeroDto
+  buscarViajes(input: BuscarViajesInput!): [Viaje!]!
+  misReservas(pasajeroId: ID!): [Reserva!]!
+}
+
+type Mutation {
+  registerPasajero(input: RegistroPasajeroInput!): RegistroResponse!
+
+  login(input: LoginPasajeroInput!): LoginResponse!
+  sendPasswordReset(email: String!): Boolean!
+  resetPassword(token: String!, newPassword: String!): Boolean!
+
+  crearReserva(input: CrearReservaDto!, pasajeroId: ID!): ReservaResponse!
+  cancelarReserva(reservaId: ID!, pasajeroId: ID!): ReservaResponse!
+}
