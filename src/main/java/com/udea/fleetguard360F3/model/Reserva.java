@@ -1,9 +1,14 @@
 package com.udea.fleetguard360F3.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Getter
+@Setter
 @Entity
 public class Reserva {
 
@@ -48,70 +53,6 @@ public class Reserva {
         this.fechaReserva = fechaReserva;
         this.codigoReserva = codigoReserva;
         this.estado = estado != null ? estado : EstadoReserva.ACTIVA;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Pasajero getPasajero() {
-        return pasajero;
-    }
-
-    public void setPasajero(Pasajero pasajero) {
-        this.pasajero = pasajero;
-    }
-
-    public Viaje getViaje() {
-        return viaje;
-    }
-
-    public void setViaje(Viaje viaje) {
-        this.viaje = viaje;
-    }
-
-    public List<PasajeroAdicional> getPasajerosAdicionales() {
-        return pasajerosAdicionales;
-    }
-
-    public void setPasajerosAdicionales(List<PasajeroAdicional> pasajerosAdicionales) {
-        this.pasajerosAdicionales = pasajerosAdicionales;
-    }
-
-    public int getCantidadAsientos() {
-        return cantidadAsientos;
-    }
-
-    public void setCantidadAsientos(int cantidadAsientos) {
-        this.cantidadAsientos = cantidadAsientos;
-    }
-
-    public LocalDateTime getFechaReserva() {
-        return fechaReserva;
-    }
-
-    public void setFechaReserva(LocalDateTime fechaReserva) {
-        this.fechaReserva = fechaReserva;
-    }
-
-    public String getCodigoReserva() {
-        return codigoReserva;
-    }
-
-    public void setCodigoReserva(String codigoReserva) {
-        this.codigoReserva = codigoReserva;
-    }
-
-    public EstadoReserva getEstado() {
-        return estado;
-    }
-
-    public void setEstado(EstadoReserva estado) {
-        this.estado = estado;
     }
 
     public enum EstadoReserva {

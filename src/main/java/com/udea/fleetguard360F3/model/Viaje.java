@@ -1,9 +1,14 @@
 package com.udea.fleetguard360F3.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+@Getter
+@Setter
 @Entity
 public class Viaje {
     @Id
@@ -36,76 +41,4 @@ public class Viaje {
         this.estado = estado;
     }
 
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getOrigen() {
-        return origen;
-    }
-
-    public void setOrigen(String origen) {
-        this.origen = origen;
-    }
-
-    public String getDestino() {
-        return destino;
-    }
-
-    public void setDestino(String destino) {
-        this.destino = destino;
-    }
-
-    public LocalDate getFecha() {
-        return fecha;
-    }
-
-    public void setFecha(LocalDate fecha) {
-        this.fecha = fecha;
-    }
-
-    public LocalTime getHoraSalida() {
-        return horaSalida;
-    }
-
-    public void setHoraSalida(LocalTime horaSalida) {
-        this.horaSalida = horaSalida;
-    }
-
-    public LocalTime getHoraLlegada() {
-        return horaLlegada;
-    }
-
-    public void setHoraLlegada(LocalTime horaLlegada) {
-        this.horaLlegada = horaLlegada;
-    }
-
-    public int getCuposTotales() {
-        return cuposTotales;
-    }
-
-    public void setCuposTotales(int cuposTotales) {
-        this.cuposTotales = cuposTotales;
-    }
-
-    public int getCuposDisponibles() {
-        return cuposDisponibles;
-    }
-
-    public void setCuposDisponibles(int cuposDisponibles) {
-        this.cuposDisponibles = cuposDisponibles;
-    }
-
-    public String getEstado() {
-        return estado;
-    }
-
-    public void setEstado(String estado) {
-        this.estado = estado;
-    }
 }

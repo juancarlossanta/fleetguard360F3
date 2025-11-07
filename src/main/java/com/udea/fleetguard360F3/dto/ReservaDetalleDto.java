@@ -1,5 +1,10 @@
 package com.udea.fleetguard360F3.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class ReservaDetalleDto {
     private Long id;
     private String codigoReserva;
@@ -15,25 +20,6 @@ public class ReservaDetalleDto {
         this.estado = estado;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getCodigoReserva() {
-        return codigoReserva;
-    }
-
-    public String getDestino() {
-        return destino;
-    }
-
-    public String getFechaViaje() {
-        return fechaViaje;
-    }
-
-    public String getEstado() {
-        return estado;
-    }
 }
 
 
