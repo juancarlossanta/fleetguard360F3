@@ -37,8 +37,6 @@ public class Reserva {
 
     private String codigoReserva;
 
-    //private String estado;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EstadoReserva estado = EstadoReserva.ACTIVA;
