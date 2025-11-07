@@ -2,4 +2,4 @@
 
 
 # Back-end fleetguard360 feature 3 para análisis de calidad
-Análisis de código estático para el objeto de prueba en fábrica escuela.
+Análisis de código estático para el objeto de prueba en fábrica escuela en el curso de calidad de software.
