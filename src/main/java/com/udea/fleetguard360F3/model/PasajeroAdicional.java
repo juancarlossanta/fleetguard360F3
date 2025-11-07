@@ -1,11 +1,15 @@
 package com.udea.fleetguard360F3.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 public class PasajeroAdicional {
 
@@ -19,16 +23,6 @@ public class PasajeroAdicional {
     @ManyToOne
     @JoinColumn(name = "reserva_id")
     private Reserva reserva;
-
-    public PasajeroAdicional() {
-    }
-
-    public PasajeroAdicional(Long id, String nombre, String documentoIdentidad, Reserva reserva) {
-        this.id = id;
-        this.nombre = nombre;
-        this.documentoIdentidad = documentoIdentidad;
-        this.reserva = reserva;
-    }
 
     // **AÑADIR ESTE CONSTRUCTOR PARA TESTING**
     public PasajeroAdicional(String nombre, String documentoIdentidad) {

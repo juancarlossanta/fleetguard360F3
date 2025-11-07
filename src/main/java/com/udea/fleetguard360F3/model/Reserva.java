@@ -1,7 +1,9 @@
 package com.udea.fleetguard360F3.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -9,6 +11,8 @@ import java.util.List;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 public class Reserva {
 
@@ -39,21 +43,6 @@ public class Reserva {
     @Column(nullable = false)
     private EstadoReserva estado = EstadoReserva.ACTIVA;
 
-
-    public Reserva() {
-    }
-
-    public Reserva(Long id, Pasajero pasajero, Viaje viaje, List<PasajeroAdicional> pasajerosAdicionales,
-                   int cantidadAsientos, LocalDateTime fechaReserva, String codigoReserva, EstadoReserva estado) {
-        this.id = id;
-        this.pasajero = pasajero;
-        this.viaje = viaje;
-        this.pasajerosAdicionales = pasajerosAdicionales;
-        this.cantidadAsientos = cantidadAsientos;
-        this.fechaReserva = fechaReserva;
-        this.codigoReserva = codigoReserva;
-        this.estado = estado != null ? estado : EstadoReserva.ACTIVA;
-    }
 
     public enum EstadoReserva {
         ACTIVA,
