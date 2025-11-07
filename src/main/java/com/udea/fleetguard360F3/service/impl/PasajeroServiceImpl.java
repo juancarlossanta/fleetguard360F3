@@ -25,7 +25,7 @@ public class PasajeroServiceImpl implements PasajeroService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final Key jwtKey;
     public final Map<String, String> resetTokens = new HashMap<>();
-    private final long EXPIRATION = 1000 * 60 * 15; // 15 min
+    private static final long EXPIRATION = (long) 1000 * 60 * 15; // 15 min
 
     public PasajeroServiceImpl(PasajeroRepository repo, BCryptPasswordEncoder passwordEncoder, Key jwtKey) {
         this.repo = repo;
