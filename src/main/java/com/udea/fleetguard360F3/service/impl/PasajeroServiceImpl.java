@@ -85,7 +85,6 @@ public class PasajeroServiceImpl implements PasajeroService {
 
     @Override
     public String generateToken(Pasajero pasajero) {
-        Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
         long now = System.currentTimeMillis();
         return Jwts.builder()
                 .setSubject(pasajero.getUsername())

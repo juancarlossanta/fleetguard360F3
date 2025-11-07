@@ -19,13 +19,12 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.TimerTask; // Necesario para evitar conflictos en el mock del Timer
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class PasajeroServiceTest {
+class PasajeroServiceTest {
 
     // 1. DEPENDENCIAS (Mocks)
     @Mock
