@@ -105,7 +105,7 @@ class ReservaServiceTest {
         int cupoInicial = viajeConCupo.getCuposDisponibles(); // 10
 
         // Simular pasajeros adicionales (CP-HU02-04)
-        PasajeroAdicional adicional1 = new PasajeroAdicional(100001, "Leo", "123", new Reserva());
+        PasajeroAdicional adicional1 = new PasajeroAdicional(Long.valueOf(100001), "Leo", "123", new Reserva());
         List<PasajeroAdicional> adicionales = Collections.singletonList(adicional1);
 
         when(viajeRepo.findById(viajeConCupo.getId())).thenReturn(Optional.of(viajeConCupo));
