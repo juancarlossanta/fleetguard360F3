@@ -19,6 +19,12 @@ type Viaje {
   estado: String!
 }
 
+"""Se agrega el type ciudad para enviar y recibir información respecto a las ciudades"""
+type Ciudad {
+  id: ID!
+  nombre: String! # La columna de interés
+}
+
 type PasajeroAdicional {
   id: ID!
   nombre: String!
@@ -31,9 +37,48 @@ type Reserva {
   cantidadAsientos: Int!
   estado: String!
   viaje: Viaje!
-  pasajeroPrincipal: PasajeroDto!
+  pasajero: PasajeroDto!
   pasajerosAdicionales: [PasajeroAdicional!]
-  createdAt: String
+  fechaReserva: String
+}
+
+type EncuestaSatisfaccion {
+  id: ID!
+  reserva: Reserva!
+  pasajero: PasajeroDto!
+  viaje: Viaje!
+  calificacionPuntualidad: Int!
+  calificacionComodidad: Int!
+  calificacionAtencionConductor: Int!
+  calificacionPrestaciones: Int!
+  calificacionGeneral: Int!
+  comentarios: String
+  fechaRespuesta: String!
+}
+
+input ResponderEncuestaInput {
+  reservaId: ID!
+  calificacionPuntualidad: Int!
+  calificacionComodidad: Int!
+  calificacionAtencionConductor: Int!
+  calificacionPrestaciones: Int!
+  calificacionGeneral: Int!
+  comentarios: String
+}
+
+type ResponderEncuestaResponse {
+  success: Boolean!
+  mensaje: String!
+  encuesta: EncuestaSatisfaccion
+}
+
+type EstadisticasEncuesta {
+  promedioPuntualidad: Float!
+  promedioComodidad: Float!
+  promedioAtencionConductor: Float!
+  promedioPrestaciones: Float!
+  promedioGeneral: Float!
+  totalEncuestas: Int!
 }
 
 input RegistroPasajeroInput {
@@ -63,6 +108,7 @@ type LoginResponse {
   message: String
   token: String
   pasajero: PasajeroDto
+
 }
 
 input ResetPasswordInput {
@@ -112,12 +158,31 @@ type ReservaResponse {
   reserva: Reserva
 }
 
+type PosicionBus {
+  latitud: Float!
+  longitud: Float!
+  etaMinutos: Int!
+  ultimaActualizacion: String!
+}
+
+type Subscription {
+  busPositionUpdated(viajeId: ID!): PosicionBus!
+}
+
 type Query {
   checkEmail(email: String!): Boolean!
   checkUsername(username: String!): Boolean!
   pasajeroById(id: ID!): PasajeroDto
   buscarViajes(input: BuscarViajesInput!): [Viaje!]!
   misReservas(pasajeroId: ID!): [Reserva!]!
+  misEncuestas: [EncuestaSatisfaccion!]!
+  yaRespondioEncuesta(reservaId: ID!): Boolean!
+  estadisticasEncuestas: EstadisticasEncuesta!
+  estadisticasEncuestasPorViaje(viajeId: ID!): EstadisticasEncuesta!
+  encuestasPorViaje(viajeId: ID!): [EncuestaSatisfaccion!]!
+  """Se agrega el type ciudad para enviar y recibir información respecto a las ciudades"""
+  buscarCiudades: [String!]!
+
 }
 
 type Mutation {
@@ -125,8 +190,18 @@ type Mutation {
 
   login(input: LoginPasajeroInput!): LoginResponse!
   sendPasswordReset(email: String!): Boolean!
-  resetPassword(token: String!, newPassword: String!): Boolean!
+  resetPassword(input: ResetPasswordInput): ResetPasswordResponse!
 
   crearReserva(input: CrearReservaDto!, pasajeroId: ID!): ReservaResponse!
   cancelarReserva(reservaId: ID!, pasajeroId: ID!): ReservaResponse!
+
+  responderEncuesta(input: ResponderEncuestaInput!): ResponderEncuestaResponse!
+  actualizarEstadoViaje(viajeId: ID!, estado: String!): Viaje!
+}
+
+enum EstadoReserva {
+  ACTIVA
+  CANCELADA
+  FINALIZADA
+  CONFIRMADA
 }

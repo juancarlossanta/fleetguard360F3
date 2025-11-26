@@ -9,4 +9,6 @@ public interface PasajeroRepository extends JpaRepository<Pasajero, Long> {
     Optional<Pasajero> findByUsername(String username);
     boolean existsByEmail(String email);
     boolean existsByUsername(String username);
+
+    Optional<Pasajero> findByResetToken(String resetToken);
 }

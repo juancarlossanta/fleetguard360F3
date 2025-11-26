@@ -13,4 +13,5 @@ public interface ReservaService {
     Reserva crearReserva(Pasajero pasajero, Long viajeId, List<PasajeroAdicional> adicionales, int cantidadAsientos);
     List<Reserva> reservasPorPasajero(Long pasajeroId);
     Reserva cancelarReserva(Long reservaId, Long pasajeroId);
+    List<String> buscarCiudades();
 }

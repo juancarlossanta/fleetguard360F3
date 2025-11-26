@@ -23,9 +23,9 @@ public class LoginPasajeroController {
         try {
             Pasajero p = service.authenticate(input.username(), input.password());
             String token = service.generateToken(p);
-            return new LoginResponse(true, "Login exitoso", token, p);
+            return new LoginResponse(true, "Login exitoso", token,p);
         } catch (IllegalArgumentException ex) {
-            return new LoginResponse(false, ex.getMessage(), null, null);
+            return new LoginResponse(false, ex.getMessage(), null,null);
         }
     }
 

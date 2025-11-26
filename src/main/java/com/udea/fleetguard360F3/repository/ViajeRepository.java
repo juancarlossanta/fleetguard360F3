@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface ViajeRepository extends JpaRepository<Viaje, Long> {
     List<Viaje> findByOrigenAndDestinoAndFecha(String origen, String destino, LocalDate fecha);
+    List<Viaje> findByEstado(String estado);
 }

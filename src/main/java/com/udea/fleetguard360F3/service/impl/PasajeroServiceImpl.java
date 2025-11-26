@@ -3,6 +3,7 @@ package com.udea.fleetguard360F3.service.impl;
 import com.udea.fleetguard360F3.dto.RegistroPasajeroDto;
 import com.udea.fleetguard360F3.model.Pasajero;
 import com.udea.fleetguard360F3.repository.PasajeroRepository;
+import com.udea.fleetguard360F3.service.EmailService;
 import com.udea.fleetguard360F3.service.PasajeroService;
 import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -12,6 +13,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import java.security.Key;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,13 +27,13 @@ public class PasajeroServiceImpl implements PasajeroService {
     private final PasajeroRepository repo;
     private final BCryptPasswordEncoder passwordEncoder;
     private final Key jwtKey;
-    public final Map<String, String> resetTokens = new HashMap<>();
-    private static final long EXPIRATION = (long) 1000 * 60 * 15; // 15 min
+    private final EmailService emailService;
 
-    public PasajeroServiceImpl(PasajeroRepository repo, BCryptPasswordEncoder passwordEncoder, Key jwtKey) {
+    public PasajeroServiceImpl(PasajeroRepository repo, BCryptPasswordEncoder passwordEncoder, Key jwtKey, EmailService emailService) {
         this.repo = repo;
         this.passwordEncoder = passwordEncoder;
         this.jwtKey = jwtKey;
+        this.emailService = emailService;
     }
     @Override
     @Transactional
@@ -104,34 +107,67 @@ public class PasajeroServiceImpl implements PasajeroService {
         Pasajero p = optional.get();
 
         String token = UUID.randomUUID().toString();
-        resetTokens.put(token, p.getUsername());
+        // Guardar token y expiración en base de datos
+        p.setResetToken(token);
+        p.setResetTokenExpiry(Instant.now().plus(15, ChronoUnit.MINUTES)); // 15 minutos
+        repo.save(p);
 
-        sendEmail(email, "Restablecer contraseña",
-                "Link: http://frontend/reset-password?token=" + token);
+        // URL del frontend
+        String resetUrl = "http://localhost:3000/reset-password?token=" + token;
 
-        new Timer().schedule(new TimerTask() {
-            public void run() {
-                resetTokens.remove(token);
-            }
-        }, EXPIRATION);
-
-        return true;
+        // Enviar correo
+        String asunto = " Restablecimiento de contraseña - FleetGuard360";
+        String cuerpo = String.format(
+                "Hola %s,\n\n" +
+                        "Recibimos una solicitud para restablecer tu contraseña.\n\n" +
+                        "Haz clic en el siguiente enlace para crear una nueva contraseña:\n" +
+                        "%s\n\n" +
+                        "Este enlace expirará en 15 minutos.\n\n" +
+                        "Si no solicitaste este cambio, puedes ignorar este correo.\n\n" +
+                        "Saludos,\n" +
+                        "Equipo FleetGuard360",
+                p.getNombre(),
+                resetUrl
+        );
+        try {
+            emailService.sendEmailWithRetry(p.getEmail(), asunto, cuerpo);
+            System.out.println(" Correo de restablecimiento enviado a: " + p.getEmail());
+            return true;
+        } catch (Exception e) {
+            System.err.println(" Error al enviar correo de restablecimiento: " + e.getMessage());
+            // Limpiar token si falla el envío
+            p.setResetToken(null);
+            p.setResetTokenExpiry(null);
+            repo.save(p);
+            return false;
+        }
     }
 
     @Override
+    @Transactional
     public void resetPassword(String token, String newPassword) {
-        String username = resetTokens.get(token);
-        if (username == null) throw new IllegalArgumentException("Token inválido o expirado");
+        Pasajero p = repo.findByResetToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("Token inválido o expirado"));
 
-        Pasajero p = repo.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+        // Verificar si el token ha expirado
+        if (p.getResetTokenExpiry() == null || Instant.now().isAfter(p.getResetTokenExpiry())) {
+            throw new IllegalArgumentException("El token ha expirado");
+        }
 
+        // Validar contraseña
+        if (newPassword == null || newPassword.length() < 8) {
+            throw new IllegalArgumentException("La contraseña debe tener al menos 8 caracteres");
+        }
+
+        // Actualizar contraseña
         p.setPasswordHash(passwordEncoder.encode(newPassword));
-        repo.save(p);
-        resetTokens.remove(token);
-    }
 
-    public void sendEmail(String to, String subject, String body) {
-        System.out.println("Enviar email a " + to + " con body: " + body);
+        // Limpiar token
+        p.setResetToken(null);
+        p.setResetTokenExpiry(null);
+
+        repo.save(p);
+
+        System.out.println(" Contraseña actualizada para: " + p.getUsername());
     }
 }

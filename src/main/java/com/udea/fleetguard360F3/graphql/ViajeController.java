@@ -6,6 +6,7 @@ import com.udea.fleetguard360F3.dto.CrearViajeDto;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.stereotype.Controller;
+import com.udea.fleetguard360F3.service.ViajeService;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -14,9 +15,10 @@ import java.time.LocalTime;
 public class ViajeController {
 
     private final ViajeRepository viajeRepo;
+    private final ViajeService viajeService;
 
-    public ViajeController(ViajeRepository viajeRepo) {
-        this.viajeRepo = viajeRepo;
+    public ViajeController(ViajeRepository viajeRepo, ViajeService viajeService) {
+        this.viajeRepo = viajeRepo; this.viajeService = viajeService;
     }
 
     @MutationMapping
@@ -31,5 +33,12 @@ public class ViajeController {
         viaje.setCuposDisponibles(input.cuposTotales());
         viaje.setEstado(input.estado());
         return viajeRepo.save(viaje);
+
     }
+
+    @MutationMapping
+    public Viaje actualizarEstadoViaje(@Argument Long viajeId, @Argument String estado) {
+        return viajeService.actualizarEstado(viajeId, estado);
+    }
+
 }
